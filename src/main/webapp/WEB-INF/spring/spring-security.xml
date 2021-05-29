@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+	xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		  http://www.springframework.org/schema/context
+  http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security.xsd">
+
+
+
+	<http pattern="/resources/**" security="none" />
+
+
+	<http>
+		<intercept-url pattern="/*" access="permitAll" />
+		<intercept-url pattern="/product/**"
+			access="hasAnyAuthority('VENDOR','ADMIN')" />
+			<intercept-url pattern="/account/admin/**"
+			access="hasAuthority('ADMIN')" />
+		<intercept-url pattern="/cart/**"
+			access="hasAuthority('CUSTOMER')" />
+			<intercept-url pattern="/orders/**"
+			access="hasAuthority('CUSTOMER')" />
+
+		<form-login login-page="/auth/login"
+			login-processing-url="/auth/login" default-target-url="/home" authentication-failure-url="/auth/login?error=1"/>
+		<logout />
+
+		<csrf disabled="true" />
+	</http>
+
+
+	<authentication-manager>
+		<authentication-provider user-service-ref="userDetailsService" >
+			<password-encoder ref="bCryptPasswordEncoder" />
+			</authentication-provider>
+			
+	</authentication-manager>
+
+
+
+	<!-- <authentication-manager> <authentication-provider> <password-encoder 
+		ref="bCryptPasswordEncoder" /> <jdbc-user-service data-source-ref="dataSource" 
+		users-by-username-query=" SELECT USER_USERNAME, USER_PASSWORD, CASE USER_ISENABLED 
+		WHEN 1 THEN 'true' ELSE 'false' END 'ENABLED' FROM USER_DATA WHERE USER_USERNAME=?;" 
+		authorities-by-username-query=" SELECT USER_USERNAME, USER_PASSWORD, USER_ROLE 
+		FROM USER_DATA WHERE USER_USERNAME=?;" /> </authentication-provider> </authentication-manager> -->
+
+	<beans:bean id="bCryptPasswordEncoder"
+		class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+		<beans:constructor-arg name="strength"
+			value="12" />
+	</beans:bean>
+
+</beans:beans>
+
+
+
+
+
+
+
